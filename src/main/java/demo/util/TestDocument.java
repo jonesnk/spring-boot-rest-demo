@@ -16,12 +16,13 @@ public class TestDocument {
     public static void main(String[] args){
 
         List<Field> fieldsList = new ArrayList<Field>();
-        String fileName = "testing-13bf9f4d-d976-4b66-a49f-360e860e02b1.xml";
+        //String fileName = "testing-13bf9f4d-d976-4b66-a49f-360e860e02b1.xml";
+        String fileName = "data.xml";
 
         StaXParser read = new StaXParser();
         Document readDoc = read.readXml(fileName);
         for (Field field : readDoc.getFields()) {
-            System.out.println(field);
+            //System.out.println(field);
             fieldsList.add(field);
         }
 
