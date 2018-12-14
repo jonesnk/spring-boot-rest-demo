@@ -155,7 +155,6 @@ public class ApiController {
             s3.putObject(new PutObjectRequest(bucketName, keyName, file));
             System.out.println("Successfully uploaded file to S3");
 
-            //transformFile(keyName);
 
             // Copy the object into a new object in the same bucket.
             CopyObjectRequest copyObjRequest = new CopyObjectRequest(bucketName, keyName, bucketName+"/copied", keyName);
