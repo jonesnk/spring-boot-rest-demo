@@ -34,7 +34,7 @@ public class ApiController {
 
     private String fileName = "document-"+UUID.randomUUID()+".xml";
 
-    @RequestMapping(value = "/req", method = RequestMethod.POST, consumes="application/xml", produces = "application/vnd.fdf")
+    @RequestMapping(value = "/request", method = RequestMethod.POST, consumes="application/xml", produces = "application/vnd.fdf")
     @ResponseBody
     public String home(@RequestBody byte[] requestBody) throws Exception {
 
@@ -100,10 +100,10 @@ public class ApiController {
         Document readDoc = read.readXml(fileName);
         for (Field field : readDoc.getFields()) {
 
-            if (field.getName() == "SUBMIT_BTN")
+            /*if (field.getName() == "SUBMIT_BTN")
             {
                 readDoc.getFields().remove(field);
-            }
+            }*/
             fieldsList.add(field);
             //System.out.println(field);
         }
