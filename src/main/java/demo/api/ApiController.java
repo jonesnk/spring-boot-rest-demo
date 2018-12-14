@@ -109,9 +109,8 @@ public class ApiController {
             JAXBContext jaxbContext = JAXBContext.newInstance(Document.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE); // To format XML
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-            //Print XML String to Console
             jaxbMarshaller.marshal(document, file);
 
             //uploadToS3(newFile, file);
