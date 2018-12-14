@@ -4,13 +4,12 @@ import demo.model.Document;
 import demo.model.Field;
 import demo.model.Ids;
 
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.*;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -32,6 +31,7 @@ public class StaXParser {
     static final String VALUE = "value";
     static final String VALUE_RICH_TEXT = "value-richtext";
     static final String NAME = "name";
+
 
     @SuppressWarnings({ "unchecked", "null" })
     public Document readXml(String xmlFile) {

@@ -52,7 +52,8 @@ public class ApiController {
             Path writtenPath = Files.write(path, requestBody);
             System.out.println("Successfully created file.");
             //uploadToS3 (fileName, writtenPath.toFile());
-            transformFile(fileName);
+            //transformFile(fileName);
+            transformPayload(fileName, requestBody);
             System.out.println("Written content in file:\n"+ new String(Files.readAllBytes(writtenPath)));
             // add aws code
             return bodyMessage("Thank you and good bye. AMEN");
@@ -113,6 +114,33 @@ public class ApiController {
         document.setFields(fieldsList);
 
         jaxbObjectToXML(document, fileName);
+    }
+
+    private static void transformPayload(String fileName, byte[] requestBody){
+
+        /***
+         *
+         *   ByteArrayInputStream in=new ByteArrayInputStream(rootNode.asXML().getBytes());
+         XMLStreamReader parser=XMLInputFactory.newInstance().createXMLStreamReader(in);
+         *
+         */
+
+        List<Field> fieldsList = new ArrayList<Field>();
+
+        StaXParser read = new StaXParser();
+        Document readDoc = read.readXml(fileName);
+        for (Field field : readDoc.getFields()) {
+
+            fieldsList.add(field);
+        }
+
+        Document document = new Document();
+        document.setIds(readDoc.getIds());
+        document.setFields(fieldsList);
+
+        jaxbObjectToXML(document, fileName);
+
+
     }
 
     private static void jaxbObjectToXML(Document document, String fileName)
