@@ -79,7 +79,7 @@ public class ApiController {
         document.setIds(readDoc.getIds());
         document.setFields(fieldsList);
 
-        jaxbObjectToXML(document, fileName);
+        writeObjectToXML(document, fileName);
     }
 
     private static void transformPayload(String fileName, byte[] requestBody){
@@ -97,10 +97,10 @@ public class ApiController {
         document.setIds(readDoc.getIds());
         document.setFields(fieldsList);
 
-        jaxbObjectToXML(document, fileName);
+        writeObjectToXML(document, fileName);
     }
 
-    private static void jaxbObjectToXML(Document document, String fileName)
+    private static void writeObjectToXML(Document document, String fileName)
     {
 
         String newFile = "transformed-"+fileName;
