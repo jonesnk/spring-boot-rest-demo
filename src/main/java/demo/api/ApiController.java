@@ -56,35 +56,7 @@ public class ApiController {
             transformPayload(fileName, requestBody);
             System.out.println("Written content in file:\n"+ new String(Files.readAllBytes(writtenPath)));
             // add aws code
-            return bodyMessage("Thank you and good bye. AMEN");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return bodyMessage("Something is wrong.");
-        }
-
-    }
-
-    @RequestMapping(value = "/transform", method = RequestMethod.POST, consumes="application/xml", produces = "plain/text")
-    @ResponseBody
-    public String transform(@RequestBody Document document) throws Exception {
-
-        String fileName = "testing-"+UUID.randomUUID()+".xml";
-
-        // "/Users/bgi056/IdeaProjects/spring-boot-rest-demo/src/main/resources/files/"
-        Path path = Paths.get(System.getProperty("user.home")+fileName);
-
-        try {
-            System.out.println("===========================================");
-            System.out.println("Trying to reach the filesystem");
-            System.out.println("===========================================\n");
-            //Path writtenFilePath = Files.write(path, requestBody);
-            System.out.println("Successfully created file.");
-            //jaxbObjectToXML(document);
-            //uploadToS3 (fileName, writtenFilePath.toFile());
-            //uploadToS3(fileName, requestBody);
-            //System.out.println("Written content in file:\n"+ new String(Files.readAllBytes(writtenFilePath)));
-            // add aws code
-            return bodyMessage("Thank you and good bye. AMEN");
+            return bodyMessage("Thank you and good bye.");
         } catch (Exception e) {
             e.printStackTrace();
             return bodyMessage("Something is wrong.");
@@ -93,18 +65,12 @@ public class ApiController {
     }
 
     private static void transformFile(String fileName){
-//this function reads the xml file and unmarshalls into object
 
         List<Field> fieldsList = new ArrayList<Field>();
 
         StaXParser read = new StaXParser();
         Document readDoc = read.readXml(fileName);
         for (Field field : readDoc.getFields()) {
-
-            /*if (field.getName() == "SUBMIT_BTN")
-            {
-                readDoc.getFields().remove(field);
-            }*/
             fieldsList.add(field);
             //System.out.println(field);
         }
@@ -119,11 +85,11 @@ public class ApiController {
     private static void transformPayload(String fileName, byte[] requestBody){
 
         List<Field> fieldsList = new ArrayList<Field>();
-
         StaXParser read = new StaXParser();
-        Document readDoc = read.readBytes(requestBody);
-        for (Field field : readDoc.getFields()) {
 
+        Document readDoc = read.readBytes(requestBody);
+
+        for (Field field : readDoc.getFields()) {
             fieldsList.add(field);
         }
 
