@@ -34,7 +34,7 @@ public class ApiController {
 
     private String fileName = "document-"+UUID.randomUUID()+".xml";
 
-    @RequestMapping(value = "/request", method = RequestMethod.POST, consumes="application/xml", produces = "application/vnd.fdf")
+    @RequestMapping(value = "/document", method = RequestMethod.POST, consumes="application/xml", produces = "application/vnd.fdf")
     @ResponseBody
     public String home(@RequestBody byte[] requestBody) throws Exception {
 
@@ -45,9 +45,7 @@ public class ApiController {
         //Path path = Paths.get("/home/ec2-user/"+fileName);
 
         try {
-            System.out.println("===========================================");
             System.out.println("Trying to reach the filesystem");
-            System.out.println("===========================================\n");
             //written file to path
             Path writtenPath = Files.write(path, requestBody);
             System.out.println("Successfully created file.");
@@ -56,35 +54,7 @@ public class ApiController {
             transformPayload(fileName, requestBody);
             System.out.println("Written content in file:\n"+ new String(Files.readAllBytes(writtenPath)));
             // add aws code
-            return bodyMessage("Thank you and good bye. AMEN");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return bodyMessage("Something is wrong.");
-        }
-
-    }
-
-    @RequestMapping(value = "/transform", method = RequestMethod.POST, consumes="application/xml", produces = "plain/text")
-    @ResponseBody
-    public String transform(@RequestBody Document document) throws Exception {
-
-        String fileName = "testing-"+UUID.randomUUID()+".xml";
-
-        // "/Users/bgi056/IdeaProjects/spring-boot-rest-demo/src/main/resources/files/"
-        Path path = Paths.get(System.getProperty("user.home")+fileName);
-
-        try {
-            System.out.println("===========================================");
-            System.out.println("Trying to reach the filesystem");
-            System.out.println("===========================================\n");
-            //Path writtenFilePath = Files.write(path, requestBody);
-            System.out.println("Successfully created file.");
-            //jaxbObjectToXML(document);
-            //uploadToS3 (fileName, writtenFilePath.toFile());
-            //uploadToS3(fileName, requestBody);
-            //System.out.println("Written content in file:\n"+ new String(Files.readAllBytes(writtenFilePath)));
-            // add aws code
-            return bodyMessage("Thank you and good bye. AMEN");
+            return bodyMessage("Thank you and good bye.");
         } catch (Exception e) {
             e.printStackTrace();
             return bodyMessage("Something is wrong.");
@@ -93,44 +63,30 @@ public class ApiController {
     }
 
     private static void transformFile(String fileName){
-//this function reads the xml file and unmarshalls into object
 
         List<Field> fieldsList = new ArrayList<Field>();
 
-        StaXParser read = new StaXParser();
-        Document readDoc = read.readXml(fileName);
+        StaXParser parser = new StaXParser();
+        Document readDoc = parser.readXmlFile(fileName);
         for (Field field : readDoc.getFields()) {
-
-            /*if (field.getName() == "SUBMIT_BTN")
-            {
-                readDoc.getFields().remove(field);
-            }*/
             fieldsList.add(field);
-            //System.out.println(field);
         }
 
         Document document = new Document();
         document.setIds(readDoc.getIds());
         document.setFields(fieldsList);
 
-        jaxbObjectToXML(document, fileName);
+        writeObjectToXML(document, fileName);
     }
 
     private static void transformPayload(String fileName, byte[] requestBody){
 
-        /***
-         *
-         *   ByteArrayInputStream in=new ByteArrayInputStream(rootNode.asXML().getBytes());
-         XMLStreamReader parser=XMLInputFactory.newInstance().createXMLStreamReader(in);
-         *
-         */
-
         List<Field> fieldsList = new ArrayList<Field>();
+        StaXParser parser = new StaXParser();
 
-        StaXParser read = new StaXParser();
-        Document readDoc = read.readXml(fileName);
+        Document readDoc = parser.readBytes(requestBody);
+
         for (Field field : readDoc.getFields()) {
-
             fieldsList.add(field);
         }
 
@@ -138,23 +94,20 @@ public class ApiController {
         document.setIds(readDoc.getIds());
         document.setFields(fieldsList);
 
-        jaxbObjectToXML(document, fileName);
-
-
+        writeObjectToXML(document, fileName);
     }
 
-    private static void jaxbObjectToXML(Document document, String fileName)
-    {
+    private static void writeObjectToXML(Document document, String fileName)
 
+    {
         String newFile = "transformed-"+fileName;
         File file = new File(newFile);
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(Document.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE); // To format XML
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-            //Print XML String to Console
             jaxbMarshaller.marshal(document, file);
 
             //uploadToS3(newFile, file);
@@ -178,9 +131,7 @@ public class ApiController {
                     e);
         }*/
 
-        System.out.println("===========================================");
         System.out.println("Trying to reach Amazon S3");
-        System.out.println("===========================================\n");
 
         AmazonS3 s3 = AmazonS3ClientBuilder.standard()
                 //.withCredentials(new AWSStaticCredentialsProvider(credentials))
@@ -199,7 +150,6 @@ public class ApiController {
             s3.putObject(new PutObjectRequest(bucketName, keyName, file));
             System.out.println("Successfully uploaded file to S3");
 
-            //transformFile(keyName);
 
             // Copy the object into a new object in the same bucket.
             CopyObjectRequest copyObjRequest = new CopyObjectRequest(bucketName, keyName, bucketName+"/copied", keyName);
