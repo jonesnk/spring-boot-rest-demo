@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 
 public class StaXParser {
@@ -24,7 +23,6 @@ public class StaXParser {
     static final String IDS = "ids";
     static final String ORIGINAL = "original";
     static final String MODIFIED = "modified";
-
 
     static final String FIELD = "field";
     static final String ID = "id";
@@ -43,34 +41,26 @@ public class StaXParser {
             // Setup a new eventReader
             ByteArrayInputStream in = new ByteArrayInputStream(requestBody);
             XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(in);
+            /***
+             *
+             *XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+             inputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
+
+             XMLStreamReader reader = inputFactory.createXMLStreamReader(in);
+             *
+             */
             // read the XML document
             Field field = null;
             Ids ids = null;
 
             while (reader.hasNext()) {
+
                 int event = reader.next();
 
-                if (event == XMLStreamConstants.START_DOCUMENT) {
+                document = new Document();
 
-                    // If we have a document element, we create a new document id
-                    if (reader.getName().getLocalPart().equals(IDS)) {
-                        document = new Document();
-                        ids = new Ids();
-                        // We read the attributes from this tag and add the name
-                        // attribute to our object
+                if (event == XMLStreamConstants.START_ELEMENT) {
 
-                        for (int i = 0; i < reader.getAttributeCount(); ++i) {
-                            String attr = reader.getAttributeLocalName(i);
-
-                            if (attr.equals(ORIGINAL)) {
-                                ids.setOriginal(reader.getAttributeValue(i));
-                            } else if (attr.equals(MODIFIED)) {
-                                ids.setModified(reader.getAttributeValue(i));
-                            }
-                        }
-
-                        document.setIds(ids);
-                    }
                     // If we have a field element, we create a new field
                     if (reader.getName().getLocalPart().equals(FIELD)) {
                         field = new Field();
@@ -82,7 +72,6 @@ public class StaXParser {
 
                             if (attr.equals(NAME)) {
                                 field.setName(reader.getAttributeValue(i));
-                                ids.setOriginal(reader.getAttributeValue(i));
                             }
                         }
 
@@ -109,6 +98,33 @@ public class StaXParser {
                     }
                 }
 
+                if (event == XMLStreamConstants.START_ELEMENT) {
+
+                    // If we have a document element, we create a new document / id
+                    if (reader.getName().getLocalPart().equals(IDS)) {
+                        //document = new Document();
+                        ids = new Ids();
+                        // We read the attributes from this tag and add the name
+                        // attribute to our object
+
+                        for (int i = 0; i < reader.getAttributeCount(); ++i) {
+                            String attr = reader.getAttributeLocalName(i);
+
+                            if (attr.equals(ORIGINAL)) {
+                                ids.setOriginal(reader.getAttributeValue(i));
+                            } else if (attr.equals(MODIFIED)) {
+                                ids.setModified(reader.getAttributeValue(i));
+                            }
+                        }
+                    }
+                }
+                // If we reach the end of an field element, we add it to the list
+                if (event == XMLStreamConstants.END_ELEMENT) {
+                    if (reader.getName().getLocalPart().equals(IDS)) {
+                        document.setIds(ids);
+                    }
+                }
+
             }
             document.setFields(fields);
         }  catch (XMLStreamException e) {
@@ -118,24 +134,7 @@ public class StaXParser {
     }
 
 
-    private String readCharacters(XMLStreamReader reader) throws XMLStreamException {
-        StringBuilder result = new StringBuilder();
-        while (reader.hasNext()) {
-            int eventType = reader.next();
-            switch (eventType) {
-                case XMLStreamReader.CHARACTERS:
-                case XMLStreamReader.CDATA:
-                    result.append(reader.getText());
-                    break;
-                case XMLStreamReader.END_ELEMENT:
-                    return result.toString();
-            }
-        }
-        throw new XMLStreamException("Premature end of file");
-    }
-
-    @SuppressWarnings({ "unchecked", "null" })
-    public Document readXml(String xmlFile) {
+    public Document readXmlFile(String xmlFile) {
         List<Field> fields = new ArrayList<Field>();
         Document document = null;
 
@@ -197,15 +196,13 @@ public class StaXParser {
                         continue;
                     }
 
-                    if (event.asStartElement().getName().getLocalPart()
-                            .equals(VALUE)) {
+                    if (event.asStartElement().getName().getLocalPart().equals(VALUE)) {
                         event = eventReader.nextEvent();
                         field.setValue(event.asCharacters().getData());
                         continue;
                     }
 
-                    if (event.asStartElement().getName().getLocalPart()
-                            .equals(VALUE_RICH_TEXT)) {
+                    if (event.asStartElement().getName().getLocalPart().equals(VALUE_RICH_TEXT)) {
                         event = eventReader.nextEvent();
                         field.setValueRichtext(event.asCharacters().getData());
                         continue;
@@ -228,6 +225,24 @@ public class StaXParser {
             e.printStackTrace();
         }
         return document;
+    }
+
+
+
+    private String readCharacters(XMLStreamReader reader) throws XMLStreamException {
+        StringBuilder result = new StringBuilder();
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+            switch (eventType) {
+                case XMLStreamReader.CHARACTERS:
+                case XMLStreamReader.CDATA:
+                    result.append(reader.getText());
+                    break;
+                case XMLStreamReader.END_ELEMENT:
+                    return result.toString();
+            }
+        }
+        throw new XMLStreamException("Premature end of file");
     }
 
 }

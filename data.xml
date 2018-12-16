@@ -4,7 +4,7 @@
 /><fields
 ><field name="SECTION_01_111_A_01_TXT"
 ><value
->Nicole Jones</value
+><strong>Nicole Jones</strong></value
 ></field
 ><field name="SECTION_01_111_B_01_TXT"
 ><value
@@ -12,7 +12,7 @@
 ></field
 ><field name="SECTION_01_111_C_01_TXT"
 ><value
->Nicole Jones</value
+><p>Nicole Jones</p></value
 ></field
 ><field name="SECTION_01_111_D_01_TXT"
 ><value

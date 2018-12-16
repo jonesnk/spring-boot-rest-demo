@@ -1,6 +1,10 @@
 package demo.model;
 
+import com.sun.xml.internal.txw2.annotation.XmlCDATA;
+import demo.util.AdapterCDATA;
+
 import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -15,9 +19,11 @@ public class Field implements Serializable {
     @XmlAttribute
     private String name;
 
+   @XmlJavaTypeAdapter(AdapterCDATA.class)
     private String value;
 
     @XmlElement(name="value-richtext")
+    //@XmlJavaTypeAdapter(AdapterCDATA.class)
     private String valueRichtext;
 
     public Field(){

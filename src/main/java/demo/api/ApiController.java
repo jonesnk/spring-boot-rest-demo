@@ -34,7 +34,7 @@ public class ApiController {
 
     private String fileName = "document-"+UUID.randomUUID()+".xml";
 
-    @RequestMapping(value = "/request", method = RequestMethod.POST, consumes="application/xml", produces = "application/vnd.fdf")
+    @RequestMapping(value = "/document", method = RequestMethod.POST, consumes="application/xml", produces = "application/vnd.fdf")
     @ResponseBody
     public String home(@RequestBody byte[] requestBody) throws Exception {
 
@@ -45,9 +45,7 @@ public class ApiController {
         //Path path = Paths.get("/home/ec2-user/"+fileName);
 
         try {
-            System.out.println("===========================================");
             System.out.println("Trying to reach the filesystem");
-            System.out.println("===========================================\n");
             //written file to path
             Path writtenPath = Files.write(path, requestBody);
             System.out.println("Successfully created file.");
@@ -68,11 +66,10 @@ public class ApiController {
 
         List<Field> fieldsList = new ArrayList<Field>();
 
-        StaXParser read = new StaXParser();
-        Document readDoc = read.readXml(fileName);
+        StaXParser parser = new StaXParser();
+        Document readDoc = parser.readXmlFile(fileName);
         for (Field field : readDoc.getFields()) {
             fieldsList.add(field);
-            //System.out.println(field);
         }
 
         Document document = new Document();
@@ -85,9 +82,9 @@ public class ApiController {
     private static void transformPayload(String fileName, byte[] requestBody){
 
         List<Field> fieldsList = new ArrayList<Field>();
-        StaXParser read = new StaXParser();
+        StaXParser parser = new StaXParser();
 
-        Document readDoc = read.readBytes(requestBody);
+        Document readDoc = parser.readBytes(requestBody);
 
         for (Field field : readDoc.getFields()) {
             fieldsList.add(field);
@@ -101,8 +98,8 @@ public class ApiController {
     }
 
     private static void writeObjectToXML(Document document, String fileName)
-    {
 
+    {
         String newFile = "transformed-"+fileName;
         File file = new File(newFile);
         try {
@@ -134,9 +131,7 @@ public class ApiController {
                     e);
         }*/
 
-        System.out.println("===========================================");
         System.out.println("Trying to reach Amazon S3");
-        System.out.println("===========================================\n");
 
         AmazonS3 s3 = AmazonS3ClientBuilder.standard()
                 //.withCredentials(new AWSStaticCredentialsProvider(credentials))
